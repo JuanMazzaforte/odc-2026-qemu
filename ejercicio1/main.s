@@ -27,10 +27,15 @@ main:
 // x5 para lugar en memoria de lectura 
 // x10 valor char de x para cargar en ram
 // x11 valor char de lugar usado
+// x15 y x16 posicion de los @
 mov x10, 0x58 //'X'
-mov x11, 0x2A //'*'
+mov x11, 0x20 //'.'
+mov x15, 0x0 //
+mov x16, 0x0 //
+
 b start
-mover:LDRB    w3, [x5]
+
+mover:LDRB    w3, [x5] //mover
 CMP	    x3, 0x23
 B.EQ	    ganar 
 STRB w10, [x5]
@@ -38,35 +43,50 @@ STRB w11, [x2]
 add x2, x5, xzr
 BR	    x30
 
-start: add x2, x0, 16 
-findx: LDURB    w3, [x2, #0]
+foundArroba: //cargar posicion de @
+subs xzr, xzr, x15
+b.NE	    llenax16
+ADD	    x15, x5, xzr
+b findArroba
+llenarx16: ADD	    x16, x5, xzr
+b finalArroba
+
+start: add x2, x0, 16  //inicio
+findx: LDURB    w3, [x2, #0]  //buscar x
 CMP x3, x10
 B.EQ encontrado
 ADD x2, x2, #1
 B findx
 
-encontrado:add x5, x2, #16
+encontrado:
+findArroba: add x5, x2, #1  //buscar teletrasportes
 LDURB    w3, [x5]
-SUBS    xzr, x3, 0x20
-B.NE	    infloop
-BL	    mover
+cmp x3, 0x40
+b.EQ	    foundArroba
+CMP	    x3, 0x4A
+b.EQ	    finalArroba
+ADD	    x5, x5, #1
+b findArroba
+
+finalArroba:
+contarBonus:
 
 ganar:mov x2, x0
 loopganar: add x2, x2, 0x10
 LDURB    w3, [x2]
 CMP	    x3, 0x4A
 B.NE	    loopganar
-STRH    w29, [x2, #4]
-mov x29, 0x4554
-STRH    w29, [x2, #6]
-mov x29, 0x4D52
-STRH    w29, [x2, #8]
-mov x29, 0x4E49
-STRH    w29, [x2, #10]
-mov x29, 0x4441
-STRH    w29, [x2, #12]
-mov x29, 0x2A4F
-STRH    w29, [x2, #14]
+STRH    w11, [x2, #4]
+mov x11, 0x4554
+STRH    w11, [x2, #6]
+mov x11, 0x4D52
+STRH    w11, [x2, #8]
+mov x11, 0x4E49
+STRH    w11, [x2, #10]
+mov x11, 0x4441
+STRH    w11, [x2, #12]
+mov x11, 0x2A4F
+STRH    w11, [x2, #14]
 
 // --------------------------------------------------------------------
     
