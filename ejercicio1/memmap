@@ -1,0 +1,14 @@
+
+MEMORY
+{
+    ram : ORIGIN = 0x0000000040080000, LENGTH = 0x400000
+}
+
+SECTIONS
+{
+    .text : { *(.text*) } > ram
+    .maze 0x40081000 : {KEEP(*(.maze))} > ram
+    .bss : { *(.bss*) } > ram
+}
+_stack_end = 0x400000;        /* STACK at RAM end */
+
