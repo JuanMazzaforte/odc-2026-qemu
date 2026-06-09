@@ -6,7 +6,12 @@
     _stack_ptr: .dword _stack_end
 
 // ------------- Modificar para agregar datos constantes --------------
-
+.equ char_x, 0x58
+.equ char_vacio, 0x20
+.equ char_llegada, 0x23
+.equ char_tp, 0x40
+.equ char_j, 0x4A
+.equ char_bonus, 0x6F
 // --------------------------------------------------------------------
 
 .section .text
@@ -28,15 +33,15 @@ main:
 // x10 valor char de x para cargar en ram
 // x11 valor char de lugar usado
 // x15 y x16 posicion de los @
-mov x10, 0x58 //'X'
-mov x11, 0x20 //'.'
+mov x10, char_x //'X'
+mov x11, char_vacio //'.'
 mov x15, 0x0 //
 mov x16, 0x0 //
 
 b start
 
 mover:LDRB    w3, [x5] //mover
-CMP	    x3, 0x23
+CMP	    x3, char_llegada
 B.EQ	    ganar 
 STRB w10, [x5]
 STRB w11, [x2]  
@@ -45,8 +50,9 @@ BR	    x30
 
 foundArroba: //cargar posicion de @
 subs xzr, xzr, x15
-b.NE	    llenax16
+b.NE	    llenarx16
 ADD	    x15, x5, xzr
+add x5, x5, 1
 b findArroba
 llenarx16: ADD	    x16, x5, xzr
 b finalArroba
@@ -58,23 +64,24 @@ B.EQ encontrado
 ADD x2, x2, #1
 B findx
 
-encontrado:
-findArroba: add x5, x2, #1  //buscar teletrasportes
+encontrado:add x5, x0, #1 
+findArroba:  //buscar teletrasportes
 LDURB    w3, [x5]
-cmp x3, 0x40
+cmp x3, char_tp
 b.EQ	    foundArroba
-CMP	    x3, 0x4A
+CMP	    x3, char_j
 b.EQ	    finalArroba
 ADD	    x5, x5, #1
 b findArroba
 
 finalArroba:
-contarBonus:
+
+
 
 ganar:mov x2, x0
 loopganar: add x2, x2, 0x10
 LDURB    w3, [x2]
-CMP	    x3, 0x4A
+CMP	    x3, char_j
 B.NE	    loopganar
 STRH    w11, [x2, #4]
 mov x11, 0x4554
