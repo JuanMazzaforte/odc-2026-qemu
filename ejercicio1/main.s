@@ -30,6 +30,7 @@ main:
 // x2 tiene la posicion en memoria de x
 // x3 para guardar la lectura del char en memoria
 // x5 para lugar en memoria de lectura 
+// x6 contador de bonus
 // x10 valor char de x para cargar en ram
 // x11 valor char de lugar usado
 // x15 y x16 posicion de los @
@@ -37,6 +38,7 @@ mov x10, char_x //'X'
 mov x11, char_vacio //'.'
 mov x15, 0x0 //
 mov x16, 0x0 //
+mov x6, 0x0
 
 b start
 
@@ -55,7 +57,12 @@ ADD	    x15, x5, xzr
 add x5, x5, 1
 b findArroba
 llenarx16: ADD	    x16, x5, xzr
-b finalArroba
+add x5, x5, 1
+b findArroba
+
+foundBonus: add x6, x6, 1 //contar los bonus
+add x5, x5, 1
+b findArroba
 
 start: add x2, x0, 16  //inicio
 findx: LDURB    w3, [x2, #0]  //buscar x
@@ -69,6 +76,8 @@ findArroba:  //buscar teletrasportes
 LDURB    w3, [x5]
 cmp x3, char_tp
 b.EQ	    foundArroba
+cmp x3, char_bonus
+b.EQ	    foundBonus
 CMP	    x3, char_j
 b.EQ	    finalArroba
 ADD	    x5, x5, #1
